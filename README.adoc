@@ -10,6 +10,17 @@ DSSAT Weather files.
 * Leap year support
 * TODO Specify time window to extract
 
+== Usage ==
+Please check the JSON files in the `samples` directory of this repository for connfiguration examples.
+
+ $ ggcmi2dssatw ../config.json
+
+This will run according to the `config.json` file on 1 MPI process.
+
+ $ mpiexec -n 27 ggcmi2dssatw ../config.json
+
+This will run according to the `config.json` file across 27 MPI processes.
+
 == Configuration ==
 All user configuration options are held in a JSON file. For a configuration example, check the `sample.json` file in the repository.
 
@@ -103,14 +114,3 @@ Run one point per process.
 
 *If the # of MPI processis is greater than # of points:*
 Warn the user of misallocated processes and under utilize the processes.
-
-== Usage ==
-Please check the JSON files in the `samples` directory of this repository for connfiguration examples.
-
- $ ggcmi2dssatw ../config.json
-
-This will run according to the `config.json` file on 1 MPI process.
-
- $ mpiexec -n 27 ggcmi2dssatw ../config.json
-
-This will run according to the `config.json` file across 27 MPI processes.
