@@ -31,15 +31,15 @@ end_year::
 The year the NetCDF files end.
 
 output_dir::
-The directory to output the DSSAT weather files.
+The directory to output the DSSAT weather files. _TODO_
 
 extent::
-A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen.
+A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen. _TODO_
 
 NOTE: This mode is exclusive of `points` mode.
 
 points::
-A json array of <<Longitude/Latitude points>>. These MUST align to the GGCMI grid.
+A json array of <<Longitude/Latitude points>>. These MUST align to the GGCMI grid. _TODO_
 
 NOTE: This mode is exclusive of `extent` mode.
 
@@ -73,7 +73,7 @@ WARNING: Currently, computing variables from other variables is not supported.
 The units are specified according to the https://www.unidata.ucar.edu/software/udunits/[udunits2 library].
 
 
-== Execution Modes ==
+== Execution Modes (TODO)==
 GGCMI2DSSATW can work in one of two execution modes, extent or points. In `extent` mode, the user specifies a bounding box of upper left and lower right coordinates and DSSAT weather files will be generated for every point in the bounding box. This is the defaultmode, and if no `extent` is specified, the entire globe will be run.
 
 In `points` mode, DSSAT weather files will be generated for user-specified points. 
@@ -105,7 +105,7 @@ Divide the extent into 4 horizontal bands, with any overflow being placed into t
 ,===
 
 
-=== Points Mode ===
+=== Points Mode (TODO) ===
 *If the # of MPI processes is less than # of points:*
 Round-robin allocation of points to processes.
 
