@@ -1,0 +1,12 @@
+.DS_Store
+/build/
+/cmake-build-debug/
+/data/
+data
+/.idea/
+/tests/CMakeFiles/
+/.vscode/
+/tests/CTestTestfile.cmake
+/tests/Makefile
+/tests/cmake_install.cmake
+
