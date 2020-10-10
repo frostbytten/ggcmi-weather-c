@@ -1,9 +1,116 @@
-= GGCMI Weather Extractor = 
+= GGCMI2DSSATW = 
+
+
+This application is used to extract data from GGCMI NetCDF files and convert that to
+DSSAT Weather files. 
+
+== Features ==
+* Unit conversion
+* Automatic calculation of monthly temperature averages and amplitude over the entire period of record.
+* Leap year support
+* TODO Specify time window to extract
+
+== Configuration ==
+All user configuration options are held in a JSON file. For a configuration example, check the `sample.json` file in the repository.
+
+start_year::
+The year the NetCDF files start.
+
+end_year::
+The year the NetCDF files end.
+
+output_dir::
+The directory to output the DSSAT weather files.
+
+extent::
+A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen.
+
+NOTE: This mode is exclusive of `points` mode.
+
+points::
+A json array of <<Longitude/Latitude points>>. These MUST align to the GGCMI grid.
+
+NOTE: This mode is exclusive of `extent` mode.
+
+mapping::
+The mapping of NetCDF to DSSAT variables, described in <<Configuration Mapping>>.
+
+=== Longitude/Latitude points ===
+Each longitude/latitude point is defined as a JSON array, formatted `[longitude,latitude]`. They are in decimal degrees, with N/E as positive values and S/W as negative values. Each point SHOULD align with the .5 degree increments set by GGCMI (ending in .25 or .75).
+
+=== Configuration Mapping ===
+According to GGCMI protocol, each NetCDF file holds the data for one variable. This section handles mapping the NetCDF variable to the equivalent DSSAT variable. Each NetCDF file should defined the following:
+
+file::
+The file name of the NetCDF file. *_required_*
+
+netcdfVar::
+The variable the NetCDF file represents. *_required_*
+
+dssatVar::
+The equivalent DSSAT variable. *_required_*
+
+sourceUnit::
+The unit of measure of the NetCDF variable. *_required if mapping units_*
+
+targetUnit::
+The unit of mesure of the DSSAT variable. *_required if mapping units_*
+
+
+WARNING: Currently, computing variables from other variables is not supported.
+
+The units are specified according to the https://www.unidata.ucar.edu/software/udunits/[udunits2 library].
+
+
+== Execution Modes ==
+GGCMI2DSSATW can work in one of two execution modes, extent or points. In `extent` mode, the user specifies a bounding box of upper left and lower right coordinates and DSSAT weather files will be generated for every point in the bounding box. This is the defaultmode, and if no `extent` is specified, the entire globe will be run.
+
+In `points` mode, DSSAT weather files will be generated for user-specified points. 
+
+
+== Parallelization using MPI ==
+MPI is used to parallelize the execution of GGCMI2DSSATW. Because of the heavy I/O involved in this process, with many small files possible, it is best practice to assign 1-2 MPI processes per node. Depending on the <<Execution Modes, execution mode>>, the following algorithm is used to assign jobs to the MPI processes:
+
+=== Extent Mode ===
+*If the # of MPI processes is 4 or less:*
+Divide the extent into _x_ horizontal bands, with any remainders being placed in the last band.
+
+*If the # of MPI processes is greater than 4:*
+Divide the extent into 4 horizontal bands, with any overflow being placed into the last band. Divide the extent into _x/4_ vertical bands, with any remainder bands being added the the first _x%4_ horizontal bands. Any overflow will be placed in the last veritcal band.
+
+.Example with 3 processes, 200x200 extent (40000 points)
+,===
+1 (200x66 = 13200)
+2 (200x66 = 13200)
+3 (200x68 = 13600)
+,===
+
+.Example with 27 processes, 200x210 extent (420000 points)
+,===
+ 1(28x52), 2(28x52), 3(28x52), 4(28x52), 5(28x52), 6(28x52), 7(32x52)
+ 8(28x52), 9(28x52),10(28x52),11(28x52),12(28x52),13(28x52),14(32x52)
+15(28x52),16(28x52),17(28x52),18(28x52),19(28x52),20(28x52),21(32x52)
+22(33x54),23(33x54),24(33x54),25(33x54),26(33x54),27(35x54),--
+,===
+
+
+=== Points Mode ===
+*If the # of MPI processes is less than # of points:*
+Round-robin allocation of points to processes.
+
+*If the # of MPI processes is equal to # of points:*
+Run one point per process.
+
+*If the # of MPI processis is greater than # of points:*
+Warn the user of misallocated processes and under utilize the processes.
 
 == Usage ==
-Please check the `config.json` for an example of the configuration.
+Please check the JSON files in the `samples` directory of this repository for connfiguration examples.
 
- % ggcmi-wth-gen ../config.json
+ $ ggcmi2dssatw ../config.json
 
-This will run the whole world according to the GGCMI NetCDF files referenced
-in the `config.json` file. All outputs will be in the current directory.
+This will run according to the `config.json` file on 1 MPI process.
+
+ $ mpiexec -n 27 ggcmi2dssatw ../config.json
+
+This will run according to the `config.json` file across 27 MPI processes.
