@@ -1,2 +1,9 @@
- = GGCMI Weather Extractor = 
+= GGCMI Weather Extractor = 
 
+== Usage ==
+Please check the `config.json` for an example of the configuration.
+
+ % ggcmi-wth-gen ../config.json
+
+This will run the whole world according to the GGCMI NetCDF files referenced
+in the `config.json` file. All outputs will be in the current directory.
