@@ -73,7 +73,7 @@ WARNING: Currently, computing variables from other variables is not supported.
 The units are specified according to the https://www.unidata.ucar.edu/software/udunits/[udunits2 library].
 
 
-== Execution Modes (TODO)==
+== Execution Modes (TODO) ==
 GGCMI2DSSATW can work in one of two execution modes, extent or points. In `extent` mode, the user specifies a bounding box of upper left and lower right coordinates and DSSAT weather files will be generated for every point in the bounding box. This is the defaultmode, and if no `extent` is specified, the entire globe will be run.
 
 In `points` mode, DSSAT weather files will be generated for user-specified points. 
