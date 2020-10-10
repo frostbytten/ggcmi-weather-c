@@ -1,2 +1,0 @@
-= GGCMI Weather Extractor =
-
