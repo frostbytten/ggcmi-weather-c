@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 extern "C" {
-#include "../location.h"
+#include "location.h"
 }
 #include "location-test.h"
 

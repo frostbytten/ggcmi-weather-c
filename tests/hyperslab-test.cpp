@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 extern "C" {
-#include "../hyperslab.h"
+#include "hyperslab.h"
 }
 
 TEST(HyperslabTest, check_corner_shape) {

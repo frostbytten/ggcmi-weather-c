@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 extern "C" {
-#include "../calendar.h"
+#include "calendar.h"
 }
 #include "calendar-test.h"
 
