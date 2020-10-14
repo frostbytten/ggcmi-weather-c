@@ -1,6 +1,7 @@
 #ifndef WTH_CONFIG_H
 #define WTH_CONFIG_H
 #include <stddef.h>
+#include "location.h"
 
 typedef struct FileConfig_ {
     char* file_name;
@@ -14,9 +15,10 @@ typedef struct FileConfig_ {
 
 typedef struct Config_ {
   int start_year;
-  char* station_vector;
-  char* station_id;
   size_t num_mappings;
+  size_t num_points;
+  int mode; //0=global, 1=extent, 2=points
+  LonLat* points;
   FileConfig mappings[];
 } Config;
 
