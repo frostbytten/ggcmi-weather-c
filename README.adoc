@@ -28,13 +28,13 @@ start_year::
 The year the NetCDF files start.
 
 end_year::
-The year the NetCDF files end.
+The year the NetCDF files end. _TODO_
 
 output_dir::
-The directory to output the DSSAT weather files. _TODO_
+The directory to output the DSSAT weather files.
 
 extent::
-A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen. _TODO_
+A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen. _TODO: Alignment to GGCMI grid, can be used if MANUALLY aligned to grid_
 
 NOTE: This mode is exclusive of `points` mode.
 
