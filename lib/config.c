@@ -1,9 +1,33 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <jansson.h>
 
 #include "config.h"
+
+static int DirectoryExists(const char *directory) {
+  if (access(directory, F_OK | R_OK | W_OK | X_OK)) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+static char *GetDirectoryString(const char *directory) {
+  size_t string_size;
+  char *final_directory;
+  string_size = strlen(directory);
+  if (directory[string_size - 1] != '/') {
+    string_size += 1;
+    final_directory = (char *)malloc(string_size);
+    size_t size = snprintf(final_directory, string_size + 1, "%s/", directory);
+  } else {
+    final_directory = (char *)malloc(string_size);
+    strncpy(final_directory, directory, string_size);
+  }
+  return final_directory;
+}
 
 static char *InsertConfigString(json_t *obj, const char *key) {
   if (obj == NULL || key == NULL)
@@ -17,11 +41,11 @@ static char *InsertConfigString(json_t *obj, const char *key) {
     return NULL;
   }
   size_t string_size = json_string_length(json_v) + 1;
-  char *v = malloc(string_size);
+  char *v = (char *)malloc(string_size);
   if (v == NULL) {
     return NULL;
   }
-  v = strncpy(v, string_v, string_size);
+  strncpy(v, string_v, string_size);
   return v;
 }
 
@@ -124,24 +148,41 @@ Config *LoadConfig(const char *source) {
   }
   if (!json_is_object(root)) {
     fprintf(stderr, "error: root is not a JSON object\n");
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
-  json_t *start_year, *mode_finder, *mappings;
+  json_t *start_year, *output_dir, *mode_finder, *mappings;
   int mode = 0;
   start_year = json_object_get(root, "start_year");
   if (!json_is_integer(start_year)) {
     fprintf(stderr, "error: root->start_year is not an integer\n");
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
   if (json_integer_value(start_year) > 3000) {
     fprintf(
         stderr,
         "error: we haven't come up with a better way to handle this by now?\n");
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
   if (json_integer_value(start_year) < 1700) {
     fprintf(stderr, "error: this probably isn't realistic to run\n");
-    goto cleanup;
+    json_decref(root);
+    return NULL;
+  }
+
+  output_dir = json_object_get(root, "output_dir");
+  if (!json_is_string(output_dir)) {
+    fprintf(stderr, "error: output_dir is not specified\n");
+    json_decref(root);
+    return NULL;
+  }
+
+  if (!DirectoryExists(json_string_value(output_dir))) {
+    fprintf(stderr, "error: output_dir does not exist\n");
+    json_decref(root);
+    return NULL;
   }
 
   mode_finder = json_object_get(root, "points");
@@ -158,7 +199,8 @@ Config *LoadConfig(const char *source) {
   }
 
   if (!ValidModeShape(mode_finder, mode)) {
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
 
   size_t mode_size;
@@ -171,18 +213,22 @@ Config *LoadConfig(const char *source) {
   mappings = json_object_get(root, "mapping");
   if (!json_is_array(mappings)) {
     fprintf(stderr, "error: root->mappings is not an array\n");
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
   size_t mappings_size = json_array_size(mappings);
 
   /* Start actually loading in the config once everything is checked */
   config = (Config *)malloc(sizeof(Config));
 
-  if (config == NULL)
-    goto cleanup;
+  if (config == NULL) {
+    json_decref(root);
+    return NULL;
+  }
   config->num_mappings = mappings_size;
   config->num_points = mode_size;
   config->start_year = json_integer_value(start_year);
+  config->output_dir = GetDirectoryString(json_string_value(output_dir));
   config->mode = mode;
   config->points = (LonLat *)malloc(sizeof(LonLat) * mode_size);
   config->mappings = (FileConfig *)malloc(sizeof(FileConfig) * mappings_size);
@@ -208,7 +254,8 @@ Config *LoadConfig(const char *source) {
     config->points = NULL;
     free(config);
     config = NULL;
-    goto cleanup;
+    json_decref(root);
+    return NULL;
   }
 
   size_t index;

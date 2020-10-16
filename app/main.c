@@ -231,31 +231,38 @@ int main(int argc, char **argv) {
       // Now we write out the file
       fprintf(debug, "%.2f,%.2f,%zu\n", global_ll.longitude, global_ll.latitude,
               XYToGlobalId(global_pos));
-      char filename[12];
-      GenerateFileName(global_pos, filename);
+      char filename[2048];
+      GenerateFileName(global_pos, config->output_dir, filename);
+      printf("+ Filename: %s\n", filename);
       FILE *fh = fopen(filename, "w");
-      fprintf(fh, "*WEATHER DATA: GGCMI\n\n");
-      fprintf(fh, "@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\n");
-      fprintf(fh, " GGCMI %8.2f %8.2f %5d %5.1f %5.1f\n", global_ll.latitude,
-              global_ll.longitude, -99, (monthly_sum / months),
-              tmaxavg - tminavg);
-      fprintf(fh, "@DATE");
-      for (size_t i = 0; i < config->num_mappings; ++i) {
-        fprintf(fh, "  %4s", config->mappings[i].dssat_var);
-      }
-      fprintf(fh, "\n");
-      ParseDate(start_date_str, &date);
-      for (size_t d = 0; d < h.edges.days; ++d) {
-        DateAsDSSAT2String(&date, date_str);
-        fprintf(fh, "%s", date_str);
-        for (size_t m = 0; m < config->num_mappings; ++m) {
-          index = (m * h.flat_size) + HyperslabValueIndex(h, Position(d, x, y));
-          fprintf(fh, "  %4.1f", converted_values[index]);
+      if (fh != NULL) {
+        fprintf(fh, "*WEATHER DATA: GGCMI\n\n");
+        fprintf(fh, "@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\n");
+        fprintf(fh, " GGCMI %8.2f %8.2f %5d %5.1f %5.1f\n", global_ll.latitude,
+                global_ll.longitude, -99, (monthly_sum / months),
+                tmaxavg - tminavg);
+        fprintf(fh, "@DATE");
+        for (size_t i = 0; i < config->num_mappings; ++i) {
+          fprintf(fh, "  %4s", config->mappings[i].dssat_var);
         }
-        AddOneDay(&date);
         fprintf(fh, "\n");
+        ParseDate(start_date_str, &date);
+        for (size_t d = 0; d < h.edges.days; ++d) {
+          DateAsDSSAT2String(&date, date_str);
+          fprintf(fh, "%s", date_str);
+          for (size_t m = 0; m < config->num_mappings; ++m) {
+            index =
+                (m * h.flat_size) + HyperslabValueIndex(h, Position(d, x, y));
+            fprintf(fh, " %5.1f", converted_values[index]);
+          }
+          AddOneDay(&date);
+          fprintf(fh, "\n");
+        }
+        fclose(fh);
+      } else {
+        fprintf(stderr, "error: could not open file for writing: %s\n",
+                filename);
       }
-      fclose(fh);
     skip_entry:
       monthly_sum = 0.0;
       tminavg = -99.9f;

@@ -28,8 +28,8 @@ XY XYPosition(size_t x, size_t y);
 LonLat LonLatPosition(double longitude, double latitude);
 XY LonLatToXY(LonLat position);
 LonLat XYToLonLat(XY position);
-size_t XYAsString(XY position, char* dest_str);
-size_t LonLatAsString(LonLat position, char* dest_str);
-size_t GenerateFileName(XY position, char* dest_str);
+size_t XYAsString(XY position, char *dest_str);
+size_t LonLatAsString(LonLat position, char *dest_str);
+size_t GenerateFileName(XY position, const char *output_dir, char *dest_str);
 size_t XYToGlobalId(XY position);
-#endif //WTH_LOCATION_H_
+#endif // WTH_LOCATION_H_

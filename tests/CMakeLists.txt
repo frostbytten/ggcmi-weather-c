@@ -16,6 +16,10 @@ target_link_libraries(location-test PRIVATE gtest gtest_main ggcmiw)
 add_executable(calendar-test  calendar-test.cpp)
 target_link_libraries(calendar-test PRIVATE gtest gtest_main ggcmiw)
 
+add_executable(config-test config-test.cpp)
+target_link_libraries(config-test PRIVATE gtest gtest_main ggcmiw PkgConfig::JANSSON)
+
 add_test(NAME test-hyperslab COMMAND hyperslab-test)
 add_test(NAME test-location COMMAND location-test)
 add_test(NAME test-calendar COMMAND calendar-test)
+add_test(NAME test-config COMMAND config-test)

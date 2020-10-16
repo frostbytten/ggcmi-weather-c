@@ -6,7 +6,6 @@
 
 #include "config.h"
 
-
 typedef struct InqVars_ {
   int num_dims;
   int num_vars;
@@ -23,11 +22,11 @@ typedef struct NetCdfInfo_ {
   size_t latitude_len;
   size_t time_len;
   float fill_value;
-  char* unit;
+  char *unit;
 } NetCdfInfo;
 
-int OpenAllDataFiles(Config* config, MPI_Comm mpi_comm, MPI_Info mpi_info);
-int CloseAllDataFiles(Config* config, NetCdfInfo* info);
-int InjectNetCdfInfo(Config* config, NetCdfInfo* info);
-void DebugDataFiles(Config* config);
-#endif //WTH_NETCDF_HANDLER_H
+int OpenAllDataFiles(Config *config, MPI_Comm mpi_comm, MPI_Info mpi_info);
+int CloseAllDataFiles(Config *config, NetCdfInfo *info);
+int InjectNetCdfInfo(Config *config, NetCdfInfo *info);
+void DebugDataFiles(Config *config);
+#endif // WTH_NETCDF_HANDLER_H

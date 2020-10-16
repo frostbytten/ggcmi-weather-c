@@ -80,9 +80,10 @@ size_t LonLatAsString(LonLat position, char *dest_str) {
   return size >= LONLAT_STRING_LEN;
 }
 
-size_t GenerateFileName(XY position, char *dest_str) {
-  size_t size = snprintf(dest_str, 12, "%zu.WTH", XYToGlobalId(position));
-  return size >= 12;
+size_t GenerateFileName(XY position, const char *output_dir, char *dest_str) {
+  size_t size =
+      snprintf(dest_str, 2048, "%s%zu.WTH", output_dir, XYToGlobalId(position));
+  return size >= 2048;
 }
 
 size_t XYToGlobalId(XY position) { return position.x + (position.y * 720) + 1; }
