@@ -11,7 +11,7 @@ DSSAT Weather files.
 * TODO Specify time window to extract
 
 == Usage ==
-Please check the JSON files in the `samples` directory of this repository for connfiguration examples.
+Please check the JSON files in the `samples` directory of this repository for configuration examples.
 
  $ ggcmi2dssatw ../config.json
 
