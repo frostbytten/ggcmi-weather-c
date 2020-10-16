@@ -1,6 +1,7 @@
-#include "unit_util.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "unit_util.h"
 
 ut_system *kUnitSystem = NULL;
 

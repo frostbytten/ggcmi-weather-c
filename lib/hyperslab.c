@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "hyperslab.h"
 
 HyperslabPosition Position(size_t day, size_t x, size_t y) {
@@ -33,9 +34,10 @@ Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
   if (num_slabs <= 0) {
     return NULL;
   }
-  Hyperslab* slabs = (Hyperslab*) malloc(sizeof(Hyperslab) * num_slabs);
+  Hyperslab *slabs = (Hyperslab *)malloc(sizeof(Hyperslab) * num_slabs);
   if (slabs == NULL) {
-    fprintf(stderr, "error: unable to allocate memory for %zu slabs\n", num_slabs);
+    fprintf(stderr, "error: unable to allocate memory for %zu slabs\n",
+            num_slabs);
     return NULL;
   }
   size_t chunks_x;
@@ -56,7 +58,7 @@ Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
   size_t internal_stride_x_rem;
   size_t temp_chunks_x;
   size_t index = 0;
-  for(size_t y=0; y < chunks_y; ++y) {
+  for (size_t y = 0; y < chunks_y; ++y) {
     if (y < chunks_rem) {
       temp_chunks_x = chunks_x + 1;
     } else {
@@ -71,13 +73,16 @@ Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
       if (x == temp_chunks_x - 1) {
         internal_stride_x += internal_stride_x_rem;
       }
-      HyperslabPosition origin = Position(0,offset.x + ((stride.x_length / temp_chunks_x) * x), offset.y + ((stride.y_length / chunks_y) *y));
-      HyperslabEdges e = Edges(stride.days, internal_stride_x, internal_stride_y);
-      printf("%zu (%zu) - %zu (%zu)\n", y, internal_stride_y, x, internal_stride_x);
-      slabs[index*sizeof(Hyperslab)] = CreateHyperslab(origin, e);
+      HyperslabPosition origin =
+          Position(0, offset.x + ((stride.x_length / temp_chunks_x) * x),
+                   offset.y + ((stride.y_length / chunks_y) * y));
+      HyperslabEdges e =
+          Edges(stride.days, internal_stride_x, internal_stride_y);
+      printf("%zu (%zu) - %zu (%zu)\n", y, internal_stride_y, x,
+             internal_stride_x);
+      slabs[index * sizeof(Hyperslab)] = CreateHyperslab(origin, e);
       ++index;
     }
   }
   return slabs;
 }
-

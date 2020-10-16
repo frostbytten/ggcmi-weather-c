@@ -1,5 +1,6 @@
-#include "location.h"
 #include <stdio.h>
+
+#include "location.h"
 
 XY XYPosition(size_t x, size_t y) {
   if (x > MAX_X) {

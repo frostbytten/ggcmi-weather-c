@@ -1,6 +1,7 @@
 #ifndef WTH_LOCATION_H_
 #define WTH_LOCATION_H_
 #include <stddef.h>
+
 #define MAX_X 719
 #define MAX_Y 359
 #define LONGITUDE_OFFSET 179.75

@@ -3,33 +3,33 @@
         "end_year": 2014,
         "output_dir": "output",
         "extent": {
-            "top_left": [-99.0, -10.0],
-            "bottom_right": [-85.0, -25.25]
+            "top_left": [-125.75, 49.25],
+            "bottom_right": [-59.75, 24.25]
         },
         "mapping": [
         {
-            "file": "../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_rsds_global_daily_2011_2014.nc",
+            "file": "../../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_rsds_global_daily_2011_2014.nc",
             "netcdfVar": "rsds",
             "dssatVar": "SRAD",
             "sourceUnit": "W m-2",
             "targetUnit": "MJ m-2 day-1"
         },
         {
-            "file": "../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_tasmin_global_daily_2011_2014.nc",
+            "file": "../../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_tasmin_global_daily_2011_2014.nc",
             "netcdfVar": "tasmin",
             "dssatVar": "TMIN",
             "sourceUnit": "Kelvin",
             "targetUnit": "degree_C"
         },
         {
-            "file": "../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_tasmax_global_daily_2011_2014.nc",
+            "file": "../../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_tasmax_global_daily_2011_2014.nc",
             "netcdfVar": "tasmax",
             "dssatVar": "TMAX",
             "sourceUnit": "K",
             "targetUnit": "degree_C"
         },
         {
-            "file": "../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_pr_global_daily_2011_2014.nc",
+            "file": "../../data/GGCMI/gfdl-esm4_r1i1p1f1_w5e5_historical_pr_global_daily_2011_2014.nc",
             "netcdfVar": "pr",
             "dssatVar": "RAIN",
             "sourceUnit": "mm s-1",

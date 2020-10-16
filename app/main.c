@@ -1,15 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <mpi.h>
+#include <netcdf.h>
+
 #include "calendar.h"
 #include "config.h"
 #include "hyperslab.h"
 #include "io.h"
 #include "location.h"
 #include "unit_util.h"
-#include <mpi.h>
-#include <netcdf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 static void resetDailyAvg(float *daily_avg) {
   for (size_t i = 0; i < 31; ++i) {
@@ -56,9 +58,8 @@ int main(int argc, char **argv) {
   for (size_t i = 0; i < config->num_mappings; ++i) {
     info[i].unit = NULL;
   }
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
-
-
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
 
   if (OpenAllDataFiles(config, MPI_COMM_WORLD, MPI_INFO_ENV) !=
       config->num_mappings) {
@@ -68,11 +69,6 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  Hyperslab* slabs = AllocateHyperslabs(Position(0,0,0),
-                                Edges(1461, 720, 360), world_size);
-
-  Hyperslab h = slabs[world_rank*sizeof(Hyperslab)];
-
   int status;
   if (InjectNetCdfInfo(config, info)) {
     CloseAllDataFiles(config, info);
@@ -80,6 +76,25 @@ int main(int argc, char **argv) {
     FreeConfig(config);
     return EXIT_FAILURE;
   }
+
+  // This is the base allocation from config.c (extent)
+  // TODO: Refactor to enable point based extraction
+  XY offset;
+  size_t x_length, y_length;
+  if (config->mode < 2) {
+    offset = LonLatToXY(config->points[0]);
+    XY bottom_right = LonLatToXY(config->points[1]);
+    x_length = bottom_right.x - offset.x;
+    y_length = bottom_right.y - offset.y;
+  }
+
+  printf("Before hyperslab allocation: sizeof days => %zu\n", info[0].time_len);
+  // TODO: Enable lower world_sizes to split into hyperslabs and run from there.
+  Hyperslab *slabs = AllocateHyperslabs(
+      Position(0, offset.x, offset.y),
+      Edges(info[0].time_len, x_length, y_length), world_size);
+
+  Hyperslab h = slabs[world_rank * sizeof(Hyperslab)];
 
   int app_status = EXIT_SUCCESS;
   float *values =
@@ -98,24 +113,29 @@ int main(int argc, char **argv) {
       goto release_resources;
     }
   }
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
   printf("Starting allocation and fetching data\n");
   for (size_t m = 0; m < config->num_mappings; ++m) {
     if ((status = nc_get_vara_float(config->mappings[m].netcdf_id,
                                     info[m].var_varid, h.corner.shape,
                                     h.edges.shape, &values[m * h.flat_size]))) {
       fprintf(stderr,
-              "error: unable to extract values from %s for variable %s.\n\t%s",
+              "error: unable to extract values from %s for variable "
+              "%s.\n\t%s\n\tCorner: %d, %d, %d\n\tEdges: %d, %d, %d\n",
               config->mappings[m].file_name, config->mappings->netcdf_var,
-              nc_strerror(status));
+              nc_strerror(status), h.corner.day, h.corner.x, h.corner.y,
+              h.edges.days, h.edges.x_length, h.edges.y_length);
       app_status = EXIT_FAILURE;
       goto release_resources;
     }
   }
   printf("Ending allocation and fetching data\n");
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
 
   size_t counter = 0;
+  size_t skipped = 0;
   char date_str[ISODATE_STRING_LEN];
   char start_date_str[ISODATE_STRING_LEN];
   status = snprintf(start_date_str, ISODATE_STRING_LEN, "%d-01-01",
@@ -149,12 +169,13 @@ int main(int argc, char **argv) {
 
   resetDailyAvg(daily_avg);
 
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
   printf("Starting I/O\n");
 
   char debug_file[15];
   snprintf(debug_file, 15, "debug_%d.csv", world_rank);
-  FILE* debug = fopen(debug_file, "w");
+  FILE *debug = fopen(debug_file, "w");
   fprintf(debug, "longitude,latitude,ID\n");
   for (size_t x = 0; x < h.edges.x_length; ++x) {
     for (size_t y = 0; y < h.edges.y_length; ++y) {
@@ -166,6 +187,7 @@ int main(int argc, char **argv) {
           if (raw_value == info[m].fill_value) {
             value = raw_value;
             if (d == 0) {
+              ++skipped;
               goto skip_entry;
             }
           } else {
@@ -207,10 +229,10 @@ int main(int argc, char **argv) {
       XY global_pos = XYPosition(h.corner.x + x, h.corner.y + y);
       LonLat global_ll = XYToLonLat(global_pos);
       // Now we write out the file
-      fprintf(debug, "%.2f,%.2f,%zu\n", global_ll.longitude, global_ll.latitude, XYToGlobalId(global_pos));
+      fprintf(debug, "%.2f,%.2f,%zu\n", global_ll.longitude, global_ll.latitude,
+              XYToGlobalId(global_pos));
       char filename[12];
-      GenerateFileName(global_pos,
-                       filename);
+      GenerateFileName(global_pos, filename);
       FILE *fh = fopen(filename, "w");
       fprintf(fh, "*WEATHER DATA: GGCMI\n\n");
       fprintf(fh, "@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\n");
@@ -248,8 +270,10 @@ int main(int argc, char **argv) {
   fclose(debug);
   printf("Records written: %zu\n", counter);
   printf("Records expected: %zu\n", h.flat_size);
+  printf("Records skipped: %zu\n", skipped * h.edges.days);
   printf("Ending I/O\n");
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
 release_resources:
   for (size_t i = 0; i < config->num_mappings; ++i) {
     printf("Releasing resources for %s\n", config->mappings[i].file_name);
@@ -265,7 +289,8 @@ release_resources:
   CloseAllDataFiles(config, info);
   FreeConfig(config);
   config = NULL;
-  printf("[%d] Checkpoint in seconds: %zu\n", world_rank, time(NULL)-start_time);
+  printf("[%d] Checkpoint in seconds: %zu\n", world_rank,
+         time(NULL) - start_time);
   MPI_Finalize();
   return app_status;
 }

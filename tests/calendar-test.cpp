@@ -1,13 +1,13 @@
 #include "gtest/gtest.h"
+
 extern "C" {
 #include "calendar.h"
 }
 #include "calendar-test.h"
 
-
 TEST(CalendarTest, create_valid_raw_date) {
   date_t nqr_date;
-  int status = CreateDate(1981, 7,7, &nqr_date);
+  int status = CreateDate(1981, 7, 7, &nqr_date);
   ASSERT_EQ(0, status);
   ASSERT_EQ(1981, nqr_date.year);
   ASSERT_EQ(7, nqr_date.month);
@@ -29,7 +29,7 @@ TEST(CalendarTest, out_of_scope_year_min) {
 
 TEST(CalendarTest, out_of_scope_year_max) {
   date_t bad_date;
-  int status = CreateDate(12345, 6,7, &bad_date);
+  int status = CreateDate(12345, 6, 7, &bad_date);
   ASSERT_EQ(1, status);
 }
 
@@ -247,4 +247,3 @@ TEST(CalendarTest, check_dssat_format_mar_no_leap) {
   ASSERT_EQ(0, status);
   ASSERT_STREQ("81073", dssat2_string);
 }
-

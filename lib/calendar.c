@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "calendar.h"
 
-
 // Use only in the context of valid and invalid
-enum {date_invalid = 0, date_valid = 1};
+enum { date_invalid = 0, date_valid = 1 };
 // Use everywhere else
-enum {date_ok, date_error};
-static int month_days[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+enum { date_ok, date_error };
+static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 /*
  * This need to be able to parse,
  * 2000-02-02
@@ -28,12 +28,14 @@ int ValidDateParts(const int year, const int month, const int day_of_month) {
   int day_error = 0;
 
   if (year < MIN_SUPPORTED_YEAR || year > MAX_SUPPORTED_YEAR) {
-    fprintf(stderr, "error: year is out-of-bounds: %d-%0d-%0d\n", year, month, day_of_month);
+    fprintf(stderr, "error: year is out-of-bounds: %d-%0d-%0d\n", year, month,
+            day_of_month);
     return date_invalid;
   }
   int is_leap = IsLeapYear(year);
   if (month < 1 || month > 12) {
-    fprintf(stderr, "error: month is out-of-bounds: %d-%0d-%0d\n", year, month, day_of_month);
+    fprintf(stderr, "error: month is out-of-bounds: %d-%0d-%0d\n", year, month,
+            day_of_month);
     return date_invalid;
   }
   if (day_of_month < 1) {
@@ -42,7 +44,7 @@ int ValidDateParts(const int year, const int month, const int day_of_month) {
     if (day_of_month > 29) {
       day_error = 1;
     }
-  } else if (day_of_month > month_days[month-1]) {
+  } else if (day_of_month > month_days[month - 1]) {
     day_error = 1;
   }
   if (day_error) {
@@ -53,7 +55,7 @@ int ValidDateParts(const int year, const int month, const int day_of_month) {
   return date_valid;
 }
 
-int ValidDate(const date_t* date) {
+int ValidDate(const date_t *date) {
   if (ValidDateParts(date->year, date->month, date->day_of_month)) {
     if (date->is_leap == IsLeapYear(date->year)) {
       return date_valid;
@@ -65,7 +67,8 @@ int ValidDate(const date_t* date) {
   }
 }
 
-int CreateDate(const int year, const int month, const int day_of_month, date_t* date) {
+int CreateDate(const int year, const int month, const int day_of_month,
+               date_t *date) {
   if (ValidDateParts(year, month, day_of_month)) {
     date->year = year;
     date->is_leap = IsLeapYear(year);
@@ -77,11 +80,12 @@ int CreateDate(const int year, const int month, const int day_of_month, date_t* 
   }
 }
 
-int ParseDate(const char* date_string, date_t* date) {
+int ParseDate(const char *date_string, date_t *date) {
   int year, month, day;
   int status = sscanf(date_string, "%d-%d-%d", &year, &month, &day);
   if (status != 3) {
-    fprintf(stderr, "error: could not parse date as [yyyy-mm-dd]: %s\n", date_string);
+    fprintf(stderr, "error: could not parse date as [yyyy-mm-dd]: %s\n",
+            date_string);
     return date_error;
   }
   status = CreateDate(year, month, day, date);
@@ -92,10 +96,11 @@ int ParseDate(const char* date_string, date_t* date) {
   }
 }
 
-int AddOneDay(date_t* date) {
+int AddOneDay(date_t *date) {
   date->day_of_month = date->day_of_month + 1;
-  if (date->month-1 < 0 || date->month-1 > 12) {
-    fprintf(stderr, "error: potential out-of-bounds with month during AddOneDay().\n");
+  if (date->month - 1 < 0 || date->month - 1 > 12) {
+    fprintf(stderr,
+            "error: potential out-of-bounds with month during AddOneDay().\n");
     return date_error;
   }
   int ceil_dom = month_days[date->month - 1];
@@ -122,17 +127,18 @@ int AddOneDay(date_t* date) {
   }
 }
 
-size_t DateAsString(const date_t* date, char* dest_str) {
-  size_t size = snprintf(dest_str, ISODATE_STRING_LEN, "%4d-%02d-%02d", date->year, date->month, date->day_of_month);
+size_t DateAsString(const date_t *date, char *dest_str) {
+  size_t size = snprintf(dest_str, ISODATE_STRING_LEN, "%4d-%02d-%02d",
+                         date->year, date->month, date->day_of_month);
   return size >= ISODATE_STRING_LEN;
 }
 
-int GetDOY(const date_t* date) {
+int GetDOY(const date_t *date) {
   int doy = 0;
   if (date->month == 1) {
     doy = date->day_of_month;
   } else {
-    for(size_t i=0; i < date->month-1; ++i) {
+    for (size_t i = 0; i < date->month - 1; ++i) {
       doy += month_days[i];
     }
     doy += date->day_of_month;
@@ -143,16 +149,17 @@ int GetDOY(const date_t* date) {
   return doy;
 }
 
-size_t DateAsDSSAT2String(const date_t* date, char* dest_str) {
+size_t DateAsDSSAT2String(const date_t *date, char *dest_str) {
   int year2d = date->year % 100;
   int doy = GetDOY(date);
   size_t size = snprintf(dest_str, D2DDATE_STRING_LEN, "%02d%03d", year2d, doy);
   return size >= D2DDATE_STRING_LEN;
 }
 
-size_t DateAsDSSAT4String(date_t* date, char* dest_str) {
+size_t DateAsDSSAT4String(date_t *date, char *dest_str) {
   int doy = GetDOY(date);
-  size_t size = snprintf(dest_str, D4DDATE_STRING_LEN, "%d%03d", date->year, doy);
+  size_t size =
+      snprintf(dest_str, D4DDATE_STRING_LEN, "%d%03d", date->year, doy);
   return size >= D4DDATE_STRING_LEN;
 }
 

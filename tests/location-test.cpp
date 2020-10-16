@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
+
 extern "C" {
 #include "location.h"
 }
 #include "location-test.h"
 
 TEST(LocationTest, xy_string_correct) {
-  const char* xy_cmp = "[7][9]";
+  const char *xy_cmp = "[7][9]";
   char xy_buf[XY_STRING_LEN];
   XY pos = XYPosition(7, 9);
   ASSERT_EQ(0, XYAsString(pos, xy_buf));

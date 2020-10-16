@@ -8,7 +8,7 @@ if(NOT googletest_POPULATED)
 endif()
 
 add_executable(hyperslab-test hyperslab-test.cpp)
-target_link_libraries(hyperslab-test PRIVATE gtest gtest_main ggcmiw)
+target_link_libraries(hyperslab-test PRIVATE gtest gtest_main ggcmiw PkgConfig::NETCDF) 
 
 add_executable(location-test location-test.cpp)
 target_link_libraries(location-test PRIVATE gtest gtest_main ggcmiw)

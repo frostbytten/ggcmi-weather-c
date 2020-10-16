@@ -1,6 +1,7 @@
 #ifndef WTH_NETCDF_HANDLER_H
 #define WTH_NETCDF_HANDLER_H
 #include <stdio.h>
+
 #include <mpi.h>
 
 #include "config.h"

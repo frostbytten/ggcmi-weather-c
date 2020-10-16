@@ -1,8 +1,10 @@
 #ifndef WTH_HYPERSLAB_H_
 #define WTH_HYPERSLAB_H_
-#include "location.h"
-#include <netcdf.h>
 #include <stddef.h>
+
+#include <netcdf.h>
+
+#include "location.h"
 
 typedef struct HyperslabPosition_ {
   size_t day;

@@ -1,9 +1,10 @@
-#include <mpi.h>
-#include <netcdf.h>
-#include <netcdf_par.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <mpi.h>
+#include <netcdf.h>
+#include <netcdf_par.h>
 
 #include "config.h"
 #include "io.h"
