@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
       Position(0, offset.x, offset.y),
       Edges(info[0].time_len, x_length, y_length), world_size);
 
-  Hyperslab h = slabs[world_rank * sizeof(Hyperslab)];
+  Hyperslab h = slabs[world_rank];
 
   int app_status = EXIT_SUCCESS;
   float *values =
@@ -233,7 +233,6 @@ int main(int argc, char **argv) {
               XYToGlobalId(global_pos));
       char filename[2048];
       GenerateFileName(global_pos, config->output_dir, filename);
-      printf("+ Filename: %s\n", filename);
       FILE *fh = fopen(filename, "w");
       if (fh != NULL) {
         fprintf(fh, "*WEATHER DATA: GGCMI\n\n");

@@ -80,7 +80,7 @@ Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
           Edges(stride.days, internal_stride_x, internal_stride_y);
       printf("%zu (%zu) - %zu (%zu)\n", y, internal_stride_y, x,
              internal_stride_x);
-      slabs[index * sizeof(Hyperslab)] = CreateHyperslab(origin, e);
+      slabs[index] = CreateHyperslab(origin, e);
       ++index;
     }
   }
