@@ -46,6 +46,6 @@ TEST(HyperslabTest, check_allocation_math) {
   Hyperslab *hs = NULL;
   HyperslabPosition pos = Position(0, 0, 0);
   HyperslabEdges stride = Edges(1461, 720, 360);
-  hs = AllocateHyperslabs(pos, stride, 4);
+  hs = AllocateHyperslabs(pos, stride, 4, 1);
   free(hs);
 }

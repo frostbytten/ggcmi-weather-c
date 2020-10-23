@@ -36,5 +36,5 @@ HyperslabEdges Edges(size_t days, size_t x_length, size_t y_length);
 Hyperslab CreateHyperslab(HyperslabPosition corner, HyperslabEdges edges);
 size_t HyperslabValueIndex(Hyperslab hyperslab, HyperslabPosition position);
 Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
-                              size_t num_slabs);
+                              size_t num_slabs, int current_rank);
 #endif // WTH_HYPERSLAB_H

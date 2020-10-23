@@ -80,19 +80,25 @@ int main(int argc, char **argv) {
   // This is the base allocation from config.c (extent)
   // TODO: Refactor to enable point based extraction
   XY offset;
+  
   size_t x_length, y_length;
   if (config->mode < 2) {
     offset = LonLatToXY(config->points[0]);
     XY bottom_right = LonLatToXY(config->points[1]);
-    x_length = bottom_right.x - offset.x;
-    y_length = bottom_right.y - offset.y;
+    x_length = bottom_right.x - offset.x + 1;
+    y_length = bottom_right.y - offset.y + 1;
+    if (world_rank == 0) {
+      printf("Box ul: %zu, %zu\n", offset.x, offset.y);
+      printf("Box br: %zu, %zu\n", bottom_right.x, bottom_right.y);
+      printf("Box size: %d, %d\n", x_length, y_length);
+    }
   }
 
   printf("Before hyperslab allocation: sizeof days => %zu\n", info[0].time_len);
-  // TODO: Enable lower world_sizes to split into hyperslabs and run from there.
+  // TODO: Enable world_sizes to split into hyperslabs and run from there.
   Hyperslab *slabs = AllocateHyperslabs(
       Position(0, offset.x, offset.y),
-      Edges(info[0].time_len, x_length, y_length), world_size);
+      Edges(info[0].time_len, x_length, y_length), world_size, world_rank);
 
   Hyperslab h = slabs[world_rank];
 

@@ -1,28 +1,28 @@
 = GGCMI2DSSATW = 
 
 
-This application is used to extract data from GGCMI NetCDF files and convert that to
+This application is used to extract data from GGCMI NetCDF files and convert that data to
 DSSAT Weather files. 
 
 == Features ==
 * Unit conversion
 * Automatic calculation of monthly temperature averages and amplitude over the entire period of record.
 * Leap year support
-* TODO Specify time window to extract
+* Specify time window to extract _TODO_
 
 == Usage ==
 Please check the JSON files in the `samples` directory of this repository for configuration examples.
 
- $ ggcmi2dssatw ../config.json
+ $ ggcmi2dssatw config.json
 
 This will run according to the `config.json` file on 1 MPI process.
 
- $ mpiexec -n 27 ggcmi2dssatw ../config.json
+ $ mpiexec -n 27 ggcmi2dssatw config.json
 
 This will run according to the `config.json` file across 27 MPI processes.
 
 == Configuration ==
-All user configuration options are held in a JSON file. For a configuration example, check the `sample.json` file in the repository.
+All user configuration options are held in a JSON file. For a configuration examples, check the `samples` directory in the repository.
 
 start_year::
 The year the NetCDF files start.
@@ -31,7 +31,7 @@ end_year::
 The year the NetCDF files end. _TODO_
 
 output_dir::
-The directory to output the DSSAT weather files.
+The directory to output the DSSAT weather files. *NOTE: This directory MUST exists prior to running*
 
 extent::
 A json object consisting of `top_left` and `bottom_right` coordinates. These MUST be specified as <<Longitude/Latitude points>>. If the points do not align to the GGCMI grid, the closest points which would include the specified bounds will be chosen. _TODO: Alignment to GGCMI grid, can be used if MANUALLY aligned to grid_
@@ -114,3 +114,6 @@ Run one point per process.
 
 *If the # of MPI processis is greater than # of points:*
 Warn the user of misallocated processes and under utilize the processes.
+
+=== More Notes about MPI Parallelization ===
+This application has *not* been designed with memory efficiency in mind. ALL data under every point (including every day), is loaded into memory at the same time. This cuts down on reading I/O, but does make the application consume significantly more memory. The more processors assigned to the MPI job, the less memory each processor needs to accomplish the job.

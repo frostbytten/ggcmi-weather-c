@@ -30,7 +30,7 @@ size_t HyperslabValueIndex(Hyperslab hyperslab,
 }
 
 Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
-                              size_t num_slabs) {
+                              size_t num_slabs, int current_rank) {
   if (num_slabs <= 0) {
     return NULL;
   }
@@ -78,8 +78,10 @@ Hyperslab *AllocateHyperslabs(HyperslabPosition offset, HyperslabEdges stride,
                    offset.y + ((stride.y_length / chunks_y) * y));
       HyperslabEdges e =
           Edges(stride.days, internal_stride_x, internal_stride_y);
-      printf("%zu (%zu) - %zu (%zu)\n", y, internal_stride_y, x,
+      if (current_rank == 0) {
+        printf("%zu (%zu) - %zu (%zu)\n", y, internal_stride_y, x,
              internal_stride_x);
+      }
       slabs[index] = CreateHyperslab(origin, e);
       ++index;
     }
