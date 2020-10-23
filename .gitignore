@@ -10,3 +10,4 @@ data
 /tests/Makefile
 /tests/cmake_install.cmake
 
+compile_commands.json
