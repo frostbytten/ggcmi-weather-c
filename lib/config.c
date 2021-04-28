@@ -110,6 +110,7 @@ static int ValidModeShape(const json_t *obj, const int mode) {
             return 0;
           }
         } else {
+          fprintf(stderr, "error: %s is not defined in extent.\n", check_fields[i]);
           return 0;
         }
       }
@@ -127,12 +128,13 @@ static int ValidModeShape(const json_t *obj, const int mode) {
       free(check_data[0]);
       return check_pf;
     } else {
+      fprintf(stderr, "error: extent is not an object.\n");
       return 0;
     }
   } else if (mode == 2) {
+    fprintf(stderr, "error: points mode is not yet supported.\n");
     return 0;
   }
-  return 0;
 }
 
 Config *LoadConfig(const char *source) {
@@ -187,6 +189,9 @@ Config *LoadConfig(const char *source) {
 
   mode_finder = json_object_get(root, "points");
   // This is where I check the shape of the points/extent
+  // 0 is entire globe
+  // 1 is extent (rectangle)
+  // 2 is points (specified in array)
   if (mode_finder != NULL) {
     mode = 2;
   } else {
