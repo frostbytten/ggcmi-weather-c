@@ -33,7 +33,7 @@ static float calculateMonthlyAvg(const float *daily_avg) {
 }
 
 int main(int argc, char **argv) {
-  printf("== GGCMI to DSSAT Weather Extractor ==\n");
+  printf("== GGCMI to DSSAT Weather(4-Digit Year) Extractor ==\n");
   size_t start_time = time(NULL);
   if (argc != 2) {
     fprintf(stderr, "error: not enough arguments\n");
@@ -253,7 +253,7 @@ int main(int argc, char **argv) {
         fprintf(fh, "\n");
         ParseDate(start_date_str, &date);
         for (size_t d = 0; d < h.edges.days; ++d) {
-          DateAsDSSAT2String(&date, date_str);
+          DateAsDSSAT4String(&date, date_str);
           fprintf(fh, "%s", date_str);
           for (size_t m = 0; m < config->num_mappings; ++m) {
             index =

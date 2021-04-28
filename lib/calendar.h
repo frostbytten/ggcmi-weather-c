@@ -23,5 +23,6 @@ int ParseDate(const char *date_string, date_t *date);
 int AddOneDay(date_t *date);
 size_t DateAsString(const date_t *date, char *dest_str);
 size_t DateAsDSSAT2String(const date_t *date, char *dest_str);
+size_t DateAsDSSAT4String(const date_t *date, char *dest_str);
 size_t MonthsInDays(size_t days);
 #endif // GGCMI_WTH_GEN__CALENDAR_H_

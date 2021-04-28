@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12..3.18)
 project(GGCMI2DSSATW
-    VERSION 1.0.0
+    VERSION 1.1.0
     DESCRIPTION "GGCMI Weather NetCDF files to DSSAT Weather files")
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
